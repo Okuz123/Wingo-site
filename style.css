@@ -1,35 +1,52 @@
 body {
     font-family: Arial;
-    background: #111;
+    background: #0f172a;
     color: white;
     text-align: center;
+    margin: 0;
+}
+
+h2 {
+    background: #ef4444;
+    padding: 10px;
 }
 
 table {
     width: 95%;
     margin: auto;
     border-collapse: collapse;
-    background: #222;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #444;
+    background: #1e293b;
 }
 
 th {
-    background: red;
+    background: #dc2626;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+}
+
+.green { color: #22c55e; font-weight: bold; }
+.red { color: #ef4444; font-weight: bold; }
+.violet { color: #a855f7; font-weight: bold; }
+
+.pagination {
+    margin-top: 15px;
 }
 
 button {
-    padding: 10px;
-    margin: 10px;
-    background: red;
-    color: white;
+    padding: 10px 15px;
+    margin: 5px;
     border: none;
+    background: #ef4444;
+    color: white;
     cursor: pointer;
+    border-radius: 5px;
 }
 
-.pagination {
+.pdfBtn {
     margin-top: 10px;
+    background: #22c55e;
 }
