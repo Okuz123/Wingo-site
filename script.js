@@ -1,43 +1,48 @@
-const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageNo=1&pageSize=10";
+const BASE_API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
 
-let allData = JSON.parse(localStorage.getItem("wingoData")) || [];
+let allData = [];
 let currentPage = 1;
 const perPage = 10;
 
-// 🔁 FETCH + FIX ORDER
+// FETCH MULTIPLE PAGES (ACCURATE ORDER)
 async function fetchData() {
-    let res = await fetch(API_URL);
-    let json = await res.json();
+    try {
+        let temp = [];
 
-    let newList = json.data.list;
+        for (let i = 1; i <= 5; i++) {
+            let res = await fetch(`${BASE_API}?pageNo=${i}&pageSize=10`);
+            let json = await res.json();
+            temp = temp.concat(json.data.list);
+        }
 
-    // merge without duplicates
-    let map = {};
-    [...allData, ...newList].forEach(item => {
-        map[item.issueNumber] = item;
-    });
+        // Remove duplicates
+        let map = {};
+        temp.forEach(item => {
+            map[item.issueNumber] = item;
+        });
 
-    allData = Object.values(map);
+        allData = Object.values(map);
 
-    // 🔥 SORT PERFECTLY
-    allData.sort((a, b) => Number(b.issueNumber) - Number(a.issueNumber));
+        // Sort latest first
+        allData.sort((a, b) => Number(b.issueNumber) - Number(a.issueNumber));
 
-    // keep latest 500
-    allData = allData.slice(0, 500);
+        displayData();
+        generateStats();
+        generatePrediction();
+        hotCold();
 
-    localStorage.setItem("wingoData", JSON.stringify(allData));
-
-    displayData();
-    generatePrediction();
+    } catch (e) {
+        console.log("Error:", e);
+    }
 }
 
-// 🎨 COLOR
+// COLOR
 function getColor(num) {
     if (num == 0 || num == 5) return "violet";
     return num % 2 === 0 ? "red" : "green";
 }
 
-// 📊 DISPLAY
+// DISPLAY TABLE
 function displayData() {
     let table = document.getElementById("tableBody");
     table.innerHTML = "";
@@ -58,63 +63,107 @@ function displayData() {
     document.getElementById("pageNum").innerText = currentPage;
 }
 
-// 🔮 SIMPLE PREDICTION
-function generatePrediction() {
-    let last10 = allData.slice(0, 10);
-
-    let big = last10.filter(x => x.number >= 5).length;
-    let small = 10 - big;
-
-    let result = big > small ? "BIG" : "SMALL";
-
-    document.getElementById("predictionBox").innerHTML =
-        `Next Possibility: <b>${result}</b>`;
+// PAGINATION
+function nextPage() {
+    if (currentPage < 50) {
+        currentPage++;
+        displayData();
+    }
 }
 
-// 📄 REAL PDF
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayData();
+    }
+}
+
+// SEARCH
+function searchData() {
+    let input = document.getElementById("searchInput").value;
+    let filtered = allData.filter(x => x.issueNumber.includes(input));
+
+    let table = document.getElementById("tableBody");
+    table.innerHTML = "";
+
+    filtered.slice(0, 20).forEach(d => {
+        table.innerHTML += `
+        <tr>
+            <td>${d.issueNumber}</td>
+            <td class="${getColor(d.number)}">${d.number}</td>
+            <td>${d.number >= 5 ? "Big" : "Small"}</td>
+            <td class="${getColor(d.number)}">●</td>
+        </tr>`;
+    });
+}
+
+// STATS
+function generateStats() {
+    let last50 = allData.slice(0, 50);
+
+    let big = last50.filter(x => x.number >= 5).length;
+    let small = 50 - big;
+
+    let even = last50.filter(x => x.number % 2 === 0).length;
+    let odd = 50 - even;
+
+    document.getElementById("statsBox").innerHTML = `
+    📊 Last 50 Results<br><br>
+    Big: ${big} | Small: ${small}<br>
+    Even: ${even} | Odd: ${odd}
+    `;
+}
+
+// PREDICTION
+function generatePrediction() {
+    let last20 = allData.slice(0, 20);
+
+    let big = last20.filter(x => x.number >= 5).length;
+    let small = 20 - big;
+
+    document.getElementById("predictionBox").innerHTML =
+        `Next Possibility: <b>${big > small ? "BIG" : "SMALL"}</b>`;
+}
+
+// HOT / COLD
+function hotCold() {
+    let freq = {};
+
+    allData.slice(0, 100).forEach(d => {
+        freq[d.number] = (freq[d.number] || 0) + 1;
+    });
+
+    let hot = Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,3);
+    let cold = Object.keys(freq).sort((a,b)=>freq[a]-freq[b]).slice(0,3);
+
+    document.getElementById("predictionBox").innerHTML += `
+    <br><br>🔥 Hot: ${hot.join(", ")}
+    <br>❄ Cold: ${cold.join(", ")}
+    `;
+}
+
+// PDF DOWNLOAD (FIXED)
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     let doc = new jsPDF();
 
     let y = 10;
 
-    allData.forEach(d => {
-        doc.text(`${d.issueNumber} - ${d.number}`, 10, y);
-        y += 6;
+    allData.forEach((d) => {
+        doc.text(`${d.issueNumber} | ${d.number}`, 10, y);
+        y += 7;
+
+        if (y > 280) {
+            doc.addPage();
+            y = 10;
+        }
     });
 
-    doc.save("wingo.pdf");
+    doc.save("wingo_data.pdf");
 }
 
-// 📊 CHART (basic)
-function drawChart() {
-    let canvas = document.getElementById("chartCanvas");
-    let ctx = canvas.getContext("2d");
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    let data = allData.slice(0, 20).map(x => x.number);
-
-    data.forEach((val, i) => {
-        ctx.fillRect(i * 15, 150 - val * 10, 10, val * 10);
-    });
-}
-
-// 🔁 Tabs
-function showTab(tab) {
-    document.querySelectorAll(".tabContent").forEach(x => x.style.display = "none");
-    document.getElementById(tab).style.display = "block";
-
-    if (tab === "chart") drawChart();
-}
-
-// Pagination
-function nextPage() { currentPage++; displayData(); }
-function prevPage() { currentPage--; displayData(); }
-
-// Auto refresh
+// AUTO REFRESH
 setInterval(fetchData, 5000);
 
-// Load
+// LOAD
 fetchData();
-displayData();
