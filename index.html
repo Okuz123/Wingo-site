@@ -2,35 +2,61 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wingo Live</title>
+<title>Wingo Pro</title>
 <link rel="stylesheet" href="style.css">
-</head>
 
+<!-- PDF LIB -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
 <body>
 
-<h2>🔥 Wingo Live Data</h2>
+<h2>🔥 Wingo Pro Dashboard</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Period</th>
-            <th>Number</th>
-            <th>Big/Small</th>
-            <th>Color</th>
-        </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-</table>
-
-<div class="pagination">
-    <button onclick="prevPage()">⬅</button>
-    <span id="pageNum">1</span> / 50
-    <button onclick="nextPage()">➡</button>
+<!-- Tabs -->
+<div class="tabs">
+    <button onclick="showTab('history')">Game History</button>
+    <button onclick="showTab('chart')">Chart</button>
+    <button onclick="showTab('strategy')">Strategy</button>
 </div>
 
-<button class="pdfBtn" onclick="downloadPDF()">📄 Download PDF</button>
+<!-- HISTORY -->
+<div id="history" class="tabContent">
+    <table>
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Number</th>
+                <th>Big/Small</th>
+                <th>Color</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="pagination">
+        <button onclick="prevPage()">⬅</button>
+        <span id="pageNum">1</span>/50
+        <button onclick="nextPage()">➡</button>
+    </div>
+</div>
+
+<!-- CHART -->
+<div id="chart" class="tabContent" style="display:none;">
+    <canvas id="chartCanvas"></canvas>
+</div>
+
+<!-- STRATEGY -->
+<div id="strategy" class="tabContent" style="display:none;">
+    <h3>Next Prediction</h3>
+    <div id="predictionBox">Loading...</div>
+</div>
+
+<div class="actions">
+    <button onclick="fetchData()">🔄 Refresh</button>
+    <button onclick="downloadPDF()">📄 Download PDF</button>
+</div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
