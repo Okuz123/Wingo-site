@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wingo Live Data</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>🔥 Wingo Live Results</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Period</th>
+            <th>Number</th>
+            <th>Big/Small</th>
+            <th>Color</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<div class="pagination">
+    <button onclick="prevPage()">⬅</button>
+    <span id="pageNum">1</span>/50
+    <button onclick="nextPage()">➡</button>
+</div>
+
+<button onclick="downloadPDF()">📄 Download PDF</button>
+
+<script src="script.js"></script>
+</body>
+</html>
