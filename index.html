@@ -3,55 +3,61 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wingo Pro</title>
-
 <link rel="stylesheet" href="style.css">
-
-<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
+
 <body>
 
-<h2>🔥 Wingo Pro Dashboard</h2>
+<h2>🔥 Wingo Pro</h2>
 
-<!-- SEARCH -->
-<input type="text" id="searchInput" class="searchBox" placeholder="Search Issue Number..." onkeyup="searchData()">
-
-<!-- STATS -->
-<div class="card" id="statsBox">Loading stats...</div>
-
-<!-- TABLE -->
-<div class="card">
-<table>
-<thead>
-<tr>
-<th>Issue</th>
-<th>Number</th>
-<th>Big/Small</th>
-<th>Color</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
-</table>
+<!-- TABS -->
+<div class="tabs">
+    <button onclick="showTab('history')">Game History</button>
+    <button onclick="showTab('chart')">Chart</button>
+    <button onclick="showTab('strategy')">Strategy</button>
 </div>
 
-<!-- PAGINATION -->
-<div class="pagination">
-<button onclick="prevPage()">⬅</button>
-<span id="pageNum">1</span>
-<button onclick="nextPage()">➡</button>
+<!-- HISTORY -->
+<div id="history" class="tab">
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Issue</th>
+                    <th>Number</th>
+                    <th>Big/Small</th>
+                    <th>Color</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <button onclick="prevPage()">⬅</button>
+        <span id="pageNum">1</span>
+        <button onclick="nextPage()">➡</button>
+    </div>
 </div>
 
-<!-- PREDICTION -->
-<div class="card">
-<h3>🎯 Prediction</h3>
-<div id="predictionBox">Loading...</div>
+<!-- CHART -->
+<div id="chart" class="tab" style="display:none;">
+    <canvas id="chartCanvas" width="350" height="200"></canvas>
 </div>
 
-<!-- BUTTONS -->
+<!-- STRATEGY -->
+<div id="strategy" class="tab" style="display:none;">
+    <div class="card">
+        <h3>🎯 Prediction</h3>
+        <div id="predictionBox"></div>
+    </div>
+</div>
+
+<!-- ACTIONS -->
 <div style="text-align:center;">
-<button onclick="fetchData()">🔄 Refresh</button>
-<button onclick="downloadPDF()">📄 Download PDF</button>
+    <button onclick="manualRefresh()">🔄 Refresh</button>
+    <button onclick="downloadPDF()">📄 PDF</button>
 </div>
 
 <script src="script.js"></script>
