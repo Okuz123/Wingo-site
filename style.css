@@ -5,44 +5,49 @@ body {
     color: white;
 }
 
-/* Header */
 h2 {
-    background: linear-gradient(to right, #ff3b3b, #ff0000);
-    padding: 12px;
-    margin: 0;
+    background: linear-gradient(to right, red, darkred);
+    padding: 10px;
     text-align: center;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    background: #1e293b;
+}
+
+.tabs button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
 }
 
 /* Table */
 table {
     width: 95%;
-    margin: 15px auto;
+    margin: auto;
     border-collapse: collapse;
     background: #1e293b;
-    border-radius: 10px;
-    overflow: hidden;
 }
 
 th {
-    background: #ef4444;
-    padding: 10px;
+    background: red;
 }
 
 td {
     padding: 10px;
     text-align: center;
-    border-bottom: 1px solid #334155;
-}
-
-/* Row hover */
-.row:hover {
-    background: #334155;
 }
 
 /* Colors */
-.green { color: #22c55e; font-weight: bold; }
-.red { color: #ef4444; font-weight: bold; }
-.violet { color: #a855f7; font-weight: bold; }
+.green { color: #22c55e; }
+.red { color: #ef4444; }
+.violet { color: #a855f7; }
 
 /* Pagination */
 .pagination {
@@ -50,18 +55,17 @@ td {
     margin: 10px;
 }
 
-button {
-    padding: 10px 15px;
-    border: none;
-    background: #ef4444;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
+/* Buttons */
+.actions {
+    text-align: center;
+    margin: 10px;
 }
 
-/* PDF Button */
-.pdfBtn {
-    display: block;
-    margin: 10px auto;
-    background: #22c55e;
+button {
+    padding: 10px;
+    margin: 5px;
+    background: red;
+    border: none;
+    color: white;
+    border-radius: 5px;
 }
