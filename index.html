@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wingo Live Data</title>
-    <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wingo Live</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h2>🔥 Wingo Live Results</h2>
+<h2>🔥 Wingo Live Data</h2>
 
 <table>
     <thead>
@@ -22,12 +24,13 @@
 
 <div class="pagination">
     <button onclick="prevPage()">⬅</button>
-    <span id="pageNum">1</span>/50
+    <span id="pageNum">1</span> / 50
     <button onclick="nextPage()">➡</button>
 </div>
 
-<button onclick="downloadPDF()">📄 Download PDF</button>
+<button class="pdfBtn" onclick="downloadPDF()">📄 Download PDF</button>
 
 <script src="script.js"></script>
+
 </body>
 </html>
