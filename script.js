@@ -1,45 +1,30 @@
-const BASE_API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+const API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageNo=1&pageSize=10";
 
-let allData = [];
+let allData = JSON.parse(localStorage.getItem("wingoData")) || [];
 let currentPage = 1;
 const perPage = 10;
 
-// FETCH MULTIPLE PAGES (ACCURATE ORDER)
+// FETCH NEW DATA (APPEND ONLY NEW)
 async function fetchData() {
-    try {
-        let temp = [];
+    let res = await fetch(API);
+    let json = await res.json();
+    let list = json.data.list;
 
-        for (let i = 1; i <= 5; i++) {
-            let res = await fetch(`${BASE_API}?pageNo=${i}&pageSize=10`);
-            let json = await res.json();
-            temp = temp.concat(json.data.list);
+    list.forEach(item => {
+        // only add if not exists
+        if (!allData.some(x => x.issueNumber === item.issueNumber)) {
+            allData.unshift(item); // add to top
         }
+    });
 
-        // Remove duplicates
-        let map = {};
-        temp.forEach(item => {
-            map[item.issueNumber] = item;
-        });
+    // keep only 500
+    allData = allData.slice(0, 500);
 
-        allData = Object.values(map);
+    localStorage.setItem("wingoData", JSON.stringify(allData));
 
-        // Sort latest first
-        allData.sort((a, b) => Number(b.issueNumber) - Number(a.issueNumber));
-
-        displayData();
-        generateStats();
-        generatePrediction();
-        hotCold();
-
-    } catch (e) {
-        console.log("Error:", e);
-    }
-}
-
-// COLOR
-function getColor(num) {
-    if (num == 0 || num == 5) return "violet";
-    return num % 2 === 0 ? "red" : "green";
+    displayData();
+    drawChart();
+    prediction();
 }
 
 // DISPLAY TABLE
@@ -48,9 +33,9 @@ function displayData() {
     table.innerHTML = "";
 
     let start = (currentPage - 1) * perPage;
-    let pageData = allData.slice(start, start + perPage);
+    let data = allData.slice(start, start + perPage);
 
-    pageData.forEach(d => {
+    data.forEach(d => {
         table.innerHTML += `
         <tr>
             <td>${d.issueNumber}</td>
@@ -63,9 +48,15 @@ function displayData() {
     document.getElementById("pageNum").innerText = currentPage;
 }
 
+// COLOR
+function getColor(num) {
+    if (num == 0 || num == 5) return "violet";
+    return num % 2 === 0 ? "red" : "green";
+}
+
 // PAGINATION
 function nextPage() {
-    if (currentPage < 50) {
+    if ((currentPage * perPage) < allData.length) {
         currentPage++;
         displayData();
     }
@@ -78,79 +69,46 @@ function prevPage() {
     }
 }
 
-// SEARCH
-function searchData() {
-    let input = document.getElementById("searchInput").value;
-    let filtered = allData.filter(x => x.issueNumber.includes(input));
+// CHART
+function drawChart() {
+    let c = document.getElementById("chartCanvas");
+    let ctx = c.getContext("2d");
 
-    let table = document.getElementById("tableBody");
-    table.innerHTML = "";
+    ctx.clearRect(0, 0, c.width, c.height);
 
-    filtered.slice(0, 20).forEach(d => {
-        table.innerHTML += `
-        <tr>
-            <td>${d.issueNumber}</td>
-            <td class="${getColor(d.number)}">${d.number}</td>
-            <td>${d.number >= 5 ? "Big" : "Small"}</td>
-            <td class="${getColor(d.number)}">●</td>
-        </tr>`;
+    let last = allData.slice(0, 20);
+
+    last.forEach((d, i) => {
+        ctx.fillRect(i * 15, 200 - d.number * 15, 10, d.number * 15);
     });
-}
-
-// STATS
-function generateStats() {
-    let last50 = allData.slice(0, 50);
-
-    let big = last50.filter(x => x.number >= 5).length;
-    let small = 50 - big;
-
-    let even = last50.filter(x => x.number % 2 === 0).length;
-    let odd = 50 - even;
-
-    document.getElementById("statsBox").innerHTML = `
-    📊 Last 50 Results<br><br>
-    Big: ${big} | Small: ${small}<br>
-    Even: ${even} | Odd: ${odd}
-    `;
 }
 
 // PREDICTION
-function generatePrediction() {
-    let last20 = allData.slice(0, 20);
+function prediction() {
+    let last = allData.slice(0, 20);
 
-    let big = last20.filter(x => x.number >= 5).length;
-    let small = 20 - big;
+    let big = last.filter(x => x.number >= 5).length;
+    let result = big > 10 ? "BIG" : "SMALL";
 
     document.getElementById("predictionBox").innerHTML =
-        `Next Possibility: <b>${big > small ? "BIG" : "SMALL"}</b>`;
+        "Next: " + result;
 }
 
-// HOT / COLD
-function hotCold() {
-    let freq = {};
-
-    allData.slice(0, 100).forEach(d => {
-        freq[d.number] = (freq[d.number] || 0) + 1;
-    });
-
-    let hot = Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,3);
-    let cold = Object.keys(freq).sort((a,b)=>freq[a]-freq[b]).slice(0,3);
-
-    document.getElementById("predictionBox").innerHTML += `
-    <br><br>🔥 Hot: ${hot.join(", ")}
-    <br>❄ Cold: ${cold.join(", ")}
-    `;
+// TABS FIX
+function showTab(tab) {
+    document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
+    document.getElementById(tab).style.display = "block";
 }
 
-// PDF DOWNLOAD (FIXED)
+// PDF FIX
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     let doc = new jsPDF();
 
     let y = 10;
 
-    allData.forEach((d) => {
-        doc.text(`${d.issueNumber} | ${d.number}`, 10, y);
+    allData.forEach(d => {
+        doc.text(`${d.issueNumber} - ${d.number}`, 10, y);
         y += 7;
 
         if (y > 280) {
@@ -159,11 +117,17 @@ function downloadPDF() {
         }
     });
 
-    doc.save("wingo_data.pdf");
+    doc.save("wingo.pdf");
 }
 
-// AUTO REFRESH
-setInterval(fetchData, 5000);
+// MANUAL REFRESH
+function manualRefresh() {
+    fetchData();
+}
+
+// AUTO FETCH EVERY 30s
+setInterval(fetchData, 30000);
 
 // LOAD
+displayData();
 fetchData();
