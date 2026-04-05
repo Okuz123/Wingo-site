@@ -1,62 +1,56 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: #0f172a;
-    color: white;
+    background: #f1f5f9;
+    color: #111;
 }
 
 h2 {
     background: linear-gradient(to right, red, darkred);
-    padding: 10px;
-    text-align: center;
-}
-
-/* Tabs */
-.tabs {
-    display: flex;
-    justify-content: space-around;
-    background: #1e293b;
-}
-
-.tabs button {
-    flex: 1;
-    padding: 10px;
-    background: none;
-    border: none;
     color: white;
-    cursor: pointer;
+    padding: 12px;
+    text-align: center;
+    margin: 0;
 }
 
-/* Table */
-table {
+.searchBox {
     width: 95%;
-    margin: auto;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.card {
+    background: white;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
     border-collapse: collapse;
-    background: #1e293b;
 }
 
 th {
     background: red;
+    color: white;
+    padding: 10px;
 }
 
 td {
     padding: 10px;
     text-align: center;
+    border-bottom: 1px solid #eee;
 }
 
-/* Colors */
-.green { color: #22c55e; }
-.red { color: #ef4444; }
-.violet { color: #a855f7; }
+.green { color: green; font-weight: bold; }
+.red { color: red; font-weight: bold; }
+.violet { color: purple; font-weight: bold; }
 
-/* Pagination */
 .pagination {
-    text-align: center;
-    margin: 10px;
-}
-
-/* Buttons */
-.actions {
     text-align: center;
     margin: 10px;
 }
@@ -64,8 +58,8 @@ td {
 button {
     padding: 10px;
     margin: 5px;
-    background: red;
     border: none;
+    background: red;
     color: white;
     border-radius: 5px;
 }
